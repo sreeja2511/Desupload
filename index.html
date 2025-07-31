@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Despload - Profile and Boards</title>
+<style>
+  /* --- General --- */
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 0; background: #fafafa; color: #333;
+  }
+  header {
+    background: #e60023; color: white; padding: 1rem 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 3px 8px rgba(230,0,35,0.5);
+  }
+  header .logo {
+    font-weight: 800; font-size: 1.7rem; cursor: pointer;
+    user-select: none;
+  }
+  header nav button {
+    background: transparent; border: none; color: white;
+    margin-left: 1.5rem; font-weight: 700; cursor: pointer;
+    font-size: 1.1rem; padding: 0.2rem 0.5rem; border-radius: 4px;
+    transition: background-color 0.3s ease;
+    user-select: none;
+  }
+  header nav button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  header nav button.active {
+    background-color: white;
+    color: #e60023;
+    box-shadow: 0 0 6px #b4001a;
+  }
+  main {
+    max-width: 960px; margin: 2rem auto; padding: 1rem;
+  }
+  section {
+    display: none;
+  }
+  section.active {
+    display: block;
+  }
+
+  /* --- Login --- */
+  #loginPage {
+    max-width: 320px; margin: 5rem auto; background: white;
+    padding: 2rem; border-radius: 8px; box-shadow: 0 0 18px rgba(0,0,0,0.12);
+    text-align: center;
+  }
+  #loginPage input {
+    width: 100%; padding: 0.6rem; margin-bottom: 1.2rem;
+    font-size: 1rem; border-radius: 6px; border: 1.5px solid #ccc;
+    transition: border-color 0.3s ease;
+  }
+  #loginPage input:focus {
+    outline: none; border-color: #e60023;
+  }
+  #loginPage button {
+    width: 100%; background: #e60023; color: white; border: none;
+    padding: 0.65rem; font-weight: 700; font-size: 1.2rem; border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px #b4001a;
+    transition: background-color 0.3s ease;
+  }
+  #loginPage button:hover {
+    background: #b4001a;
+  }
+  #loginError {
+    color: red; margin-bottom: 1rem; min-height: 1.2rem;
+    font-weight: 600;
+  }
+
+  /* --- Profile --- */
+  #profilePage {
+    background: white;
+    padding: 2rem;
+    border-radius: 14px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  }
+  #profilePicPreview {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #e60023;
+    display: block;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(230,0,35,0.8);
+    transition: box-shadow 0.3s ease;
+  }
+  #profilePicPreview:hover {
+    box-shadow: 0 0 15px #b4001a;
+  }
+  #uploadProfilePicInput {
+    display: none;
+  }
+  #profileUsername {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #e60023;
+    margin-bottom: 1.4rem;
+    user-select: none;
+  }
+  #bioInput {
+    width: 100%;
+    min-height: 90px;
+    font-size: 1.1rem;
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: 1.8px solid #ccc;
+    resize: vertical;
+    margin-bottom: 1.2rem;
+    transition: border-color 0.3s ease;
+  }
+  #bioInput:focus {
+    border-color: #e60023;
+    outline: none;
+  }
+  #saveBioBtn {
+    background: #e60023;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.4rem;
+    font-weight: 800;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 9px #b4001a;
+    transition: background-color 0.3s ease;
+  }
+  #saveBioBtn:hover {
+    background: #b4001a;
+  }
+
+  /* --- Boards --- */
+  #boardsSection {
+    margin-top: 3rem;
+  }
+  #boardsSection h3 {
+    margin-bottom: 0.8rem;
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: 0.05em;
+  }
+  #createBoardForm {
+    display: flex;
+    gap: 0.7rem;
+    margin-bottom: 1.4rem;
+  }
+  #boardNameInput {
+    flex: 1;
+    padding: 0.65rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1.5px solid #ccc;
+    transition: border-color 0.3s ease;
+  }
+  #boardNameInput:focus {
+    border-color: #e60023;
+    outline: none;
+  }
+  #createBoardBtn {
+    background: #e60023;
+    color: white;
+    border: none;
+    padding: 0.65rem 1.3rem;
+    font-weight: 800;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px #b4001a;
+    transition: background-color 0.3s ease;
+  }
+  #createBoardBtn:hover {
+    background: #b4001a;
+  }
+  #boardsList {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  #boardsList li {
+    padding: 0.7rem 1.3rem;
+    background: #e60023;
+    color: white;
+    border-radius: 24px;
+    cursor: pointer;
+    font-weight: 800;
+    user-select: none;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 5px #b4001a;
+  }
+  #boardsList li:hover {
+    background: #b4001a;
+    box-shadow: 0 4px 10px #800011;
+  }
+  #boardsList li.active {
+    background: white;
+    color: #e60023;
+    box-shadow: 0 0 12px #b4001a;
+  }
+
+  /* --- Add Pin Section --- */
+  #currentBoardSection {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 2px solid #e60023;
+  }
+  #currentBoardName {
+    font-weight: 900;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  #addPinForm {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  #pinImageInput {
+    flex: 1 1 150px;
+    cursor: pointer;
+  }
+  #pinCaptionInput {
+    flex: 2 1 300px;
+    padding: 0.55rem;
+    font-size: 1rem;
+    border-radius: 8px;
+    border: 1.5px solid #ccc;
+    transition: border-color 0.3s ease;
+  }
+  #pinCaptionInput:focus {
+    border-color: #e60023;
+    outline: none;
+  }
+  #addPinBtn {
+    background: #e60023;
+    color: white;
+    border: none;
+    padding: 0.65rem 1.3rem;
+    font-weight: 700;
+    cursor: pointer;
+    border-radius: 8px;
+    flex: 0 0 auto;
+    box-shadow: 0 3px 7px #b4001a;
+    transition: background-color 0.3s ease;
+  }
+  #addPinBtn:hover {
+    background: #b4001a;
+  }
+
+  /* --- Board Pins Grid --- */
+  .pinsGrid {
+    column-count: 4;
+    column-gap: 1rem;
+  }
+  @media (max-width: 1100px) {
+    .pinsGrid {
+      column-count: 3;
+    }
+  }
+  @media (max-width: 700px) {
+    .pinsGrid {
+      column-count: 2;
+    }
+  }
+  @media (max-width: 450px) {
+    .pinsGrid {
+      column-count: 1;
+    }
+  }
+  .pin {
+    background: white;
+    display: inline-block;
+    margin: 0 0 1rem;
+    width: 100%;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    break-inside: avoid;
+    overflow: hidden;
+    cursor: default;
+    transition: box-shadow 0.3s ease;
+  }
+  .pin:hover {
+    box-shadow: 0 6px 20px rgba(230,0,35,0.35);
+  }
+  .pin img {
+    width: 100%;
+    display: block;
+  }
+  .pin-caption {
+    padding: 0.8rem 1rem 1rem;
+    font-size: 1rem;
+    color: #555;
+  }
+
+  /* --- Search Page --- */
+  #searchPage {
+    background: white;
+    padding: 2rem;
+    border-radius: 14px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  }
+  #searchInput {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    border: 2px solid #ccc;
+    margin-bottom: 1.5rem;
+    transition: border-color 0.3s ease;
+  }
+  #searchInput:focus {
+    border-color: #e60023;
+    outline: none;
+  }
+  #searchResults {
+    list-style: none;
+    padding: 0;
+  }
+  #searchResults li {
+    display: flex;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+  }
+  #searchResults li:hover {
+    background-color: #ffe0e4;
+  }
+  #searchResults img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 1rem;
+    border: 2px solid #e60023;
+  }
+  #searchResults .user-info {
+    flex: 1;
+  }
+  #searchResults .user-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #e60023;
+  }
+  #searchResults .user-bio {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.15rem;
+  }
+
+  /* --- Read-only Profile Modal --- */
+  #readonlyProfileModal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+  }
+  #readonlyProfileModal.active {
+    display: flex;
+  }
+  #readonlyProfileContent {
+    background: white;
+    max-width: 400px;
+    padding: 2rem;
+    border-radius: 14px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  #readonlyProfileContent img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #e60023;
+    margin-bottom: 1rem;
+  }
+  #readonlyProfileContent h3 {
+    margin-bottom: 0.3rem;
+    color: #e60023;
+  }
+  #readonlyProfileContent p {
+    color: #555;
+    margin-bottom: 1rem;
+  }
+  #closeReadonlyBtn {
+    background: #e60023;
+    border: none;
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  #closeReadonlyBtn:hover {
+    background: #b4001a;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo" tabindex="0">Despload</div>
+  <nav>
+    <button id="navHome" class="active" aria-label="Home">Home</button>
+    <button id="navSearch" aria-label="Search Users">Search Users</button>
+    <button id="navProfile" aria-label="Profile">Profile</button>
+    <button id="navLogout" style="display:none;" aria-label="Logout">Logout</button>
+  </nav>
+</header>
+
+<main>
+  <!-- LOGIN -->
+  <section id="loginPage" class="active" aria-label="Login Page">
+    <h2>Login to Despload</h2>
+    <div id="loginError" role="alert" aria-live="assertive"></div>
+    <form id="loginForm">
+      <input type="text" id="usernameInput" placeholder="Enter username" required autocomplete="off" aria-required="true" />
+      <button type="submit">Login</button>
+    </form>
+    <p style="font-size:0.9rem; margin-top: 1rem; color:#666;">For demo: Just enter a username and login.</p>
+  </section>
+
+  <!-- HOME -->
+  <section id="homePage" aria-label="Home Page">
+    <h2>Home Feed</h2>
+    <p>Welcome, <strong id="homeUsername"></strong>!</p>
+    <p>This is the Home feed content.</p>
+  </section>
+
+  <!-- SEARCH -->
+  <section id="searchPage" aria-label="Search Users">
+    <h2>Search Users</h2>
+    <input type="search" id="searchInput" placeholder="Search users by username..." aria-label="Search users" />
+    <ul id="searchResults" role="list"></ul>
+  </section>
+
+  <!-- PROFILE -->
+  <section id="profilePage" aria-label="Profile Page">
+    <h2>Profile</h2>
+
+    <label for="uploadProfilePicInput" title="Click to upload profile picture" tabindex="0" style="display:inline-block;">
+      <img src="https://via.placeholder.com/140?text=No+Image" alt="Profile Picture" id="profilePicPreview" />
+    </label>
+    <input type="file" id="uploadProfilePicInput" accept="image/*" aria-label="Upload profile picture" />
+
+    <div id="profileUsername"></div>
+
+    <textarea id="bioInput" placeholder="Write your bio here..." aria-label="Bio"></textarea><br/>
+    <button id="saveBioBtn">Save Bio</button>
+
+    <div id="boardsSection">
+      <h3>Your Boards</h3>
+      <form id="createBoardForm">
+        <input type="text" id="boardNameInput" placeholder="New board name" maxlength="30" required aria-required="true" />
+        <button type="submit" id="createBoardBtn">Create Board</button>
+      </form>
+      <ul id="boardsList" role="list"></ul>
+    </div>
+
+    <div id="currentBoardSection" hidden>
+      <h3>Board: <span id="currentBoardName"></span></h3>
+      <form id="addPinForm">
+        <input type="file" id="pinImageInput" accept="image/*" required aria-required="true" />
+        <input type="text" id="pinCaptionInput" placeholder="Pin caption" maxlength="150" aria-label="Pin caption" />
+        <button type="submit" id="addPinBtn">Add Pin</button>
+      </form>
+      <div class="pinsGrid" id="boardPinsGrid" role="list"></div>
+    </div>
+  </section>
+</main>
+
+<!-- Read-only Profile Modal -->
+<div id="readonlyProfileModal" role="dialog" aria-modal="true" aria-labelledby="readonlyProfileTitle">
+  <div id="readonlyProfileContent">
+    <img src="" alt="User profile picture" id="readonlyProfilePic" />
+    <h3 id="readonlyProfileTitle"></h3>
+    <p id="readonlyProfileBio"></p>
+    <button id="closeReadonlyBtn" aria-label="Close user profile">Close</button>
+  </div>
+</div>
+
+<script>
+  // Elements
+  const loginPage = document.getElementById('loginPage');
+  const homePage = document.getElementById('homePage');
+  const searchPage = document.getElementById('searchPage');
+  const profilePage = document.getElementById('profilePage');
+  const navHome = document.getElementById('navHome');
+  const navSearch = document.getElementById('navSearch');
+  const navProfile = document.getElementById('navProfile');
+  const navLogout = document.getElementById('navLogout');
+  const loginForm = document.getElementById('loginForm');
+  const usernameInput = document.getElementById('usernameInput');
+  const loginError = document.getElementById('loginError');
+  const homeUsername = document.getElementById('homeUsername');
+
+  const profilePicPreview = document.getElementById('profilePicPreview');
+  const uploadProfilePicInput = document.getElementById('uploadProfilePicInput');
+  const profileUsername = document.getElementById('profileUsername');
+  const bioInput = document.getElementById('bioInput');
+  const saveBioBtn = document.getElementById('saveBioBtn');
+
+  const boardsList = document.getElementById('boardsList');
+  const createBoardForm = document.getElementById('createBoardForm');
+  const boardNameInput = document.getElementById('boardNameInput');
+  const currentBoardSection = document.getElementById('currentBoardSection');
+  const currentBoardName = document.getElementById('currentBoardName');
+  const addPinForm = document.getElementById('addPinForm');
+  const pinImageInput = document.getElementById('pinImageInput');
+  const pinCaptionInput = document.getElementById('pinCaptionInput');
+  const boardPinsGrid = document.getElementById('boardPinsGrid');
+
+  const readonlyProfileModal = document.getElementById('readonlyProfileModal');
+  const readonlyProfilePic = document.getElementById('readonlyProfilePic');
+  const readonlyProfileTitle = document.getElementById('readonlyProfileTitle');
+  const readonlyProfileBio = document.getElementById('readonlyProfileBio');
+  const closeReadonlyBtn = document.getElementById('closeReadonlyBtn');
+
+  // Variables
+  let users = JSON.parse(localStorage.getItem('desploadUsers')) || {};
+  let currentUser = null;
+  let currentBoardId = null;
+
+  // Show page helper
+  function showPage(page) {
+    [loginPage, homePage, searchPage, profilePage].forEach(s => s.classList.remove('active'));
+    navHome.classList.remove('active');
+    navSearch.classList.remove('active');
+    navProfile.classList.remove('active');
+    navLogout.style.display = currentUser ? 'inline-block' : 'none';
+
+    switch(page) {
+      case 'login':
+        loginPage.classList.add('active');
+        break;
+      case 'home':
+        homePage.classList.add('active');
+        navHome.classList.add('active');
+        break;
+      case 'search':
+        searchPage.classList.add('active');
+        navSearch.classList.add('active');
+        break;
+      case 'profile':
+        profilePage.classList.add('active');
+        navProfile.classList.add('active');
+        break;
+    }
+  }
+
+  // Load user data or create new user
+  function loadUserData(username) {
+    if(!users[username]) {
+      users[username] = {
+        profilePic: '',
+        bio: '',
+        boards: {}
+      };
+      saveUsers();
+    }
+    currentUser = username;
+    renderProfile();
+  }
+
+  // Save users to localStorage
+  function saveUsers() {
+    localStorage.setItem('desploadUsers', JSON.stringify(users));
+  }
+
+  // Render profile page
+  function renderProfile() {
+    const userData = users[currentUser];
+    profileUsername.textContent = currentUser;
+    bioInput.value = userData.bio || '';
+    profilePicPreview.src = userData.profilePic || 'https://via.placeholder.com/140?text=No+Image';
+    renderBoards();
+    hideCurrentBoard();
+  }
+
+  // Render boards list
+  function renderBoards() {
+    const userBoards = users[currentUser].boards;
+    boardsList.innerHTML = '';
+    for (const boardId in userBoards) {
+      const li = document.createElement('li');
+      li.textContent = userBoards[boardId].name;
+      li.dataset.boardId = boardId;
+      if(boardId === currentBoardId) li.classList.add('active');
+      li.tabIndex = 0;
+      li.setAttribute('role', 'button');
+      li.setAttribute('aria-pressed', boardId === currentBoardId ? 'true' : 'false');
+      li.addEventListener('click', () => {
+        currentBoardId = boardId;
+        renderBoards();
+        showCurrentBoard();
+      });
+      li.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          li.click();
+        }
+      });
+      boardsList.appendChild(li);
+    }
+  }
+
+  // Show current board pins and add pin section
+  function showCurrentBoard() {
+    if(!currentBoardId) {
+      hideCurrentBoard();
+      return;
+    }
+    currentBoardSection.hidden = false;
+    currentBoardName.textContent = users[currentUser].boards[currentBoardId].name;
+    renderBoardPins();
+  }
+
+  // Hide current board section
+  function hideCurrentBoard() {
+    currentBoardSection.hidden = true;
+    currentBoardName.textContent = '';
+    boardPinsGrid.innerHTML = '';
+  }
+
+  // Render pins grid for current board
+  function renderBoardPins() {
+    const pins = users[currentUser].boards[currentBoardId].pins || [];
+    boardPinsGrid.innerHTML = '';
+    pins.forEach(pin => {
+      const pinDiv = document.createElement('div');
+      pinDiv.className = 'pin';
+      const img = document.createElement('img');
+      img.src = pin.imageData;
+      img.alt = pin.caption || 'Pin image';
+      pinDiv.appendChild(img);
+      if(pin.caption) {
+        const caption = document.createElement('div');
+        caption.className = 'pin-caption';
+        caption.textContent = pin.caption;
+        pinDiv.appendChild(caption);
+      }
+      boardPinsGrid.appendChild(pinDiv);
+    });
+  }
+
+  // Save bio
+  saveBioBtn.addEventListener('click', () => {
+    const bioText = bioInput.value.trim();
+    users[currentUser].bio = bioText;
+    saveUsers();
+    alert('Bio saved!');
+  });
+
+  // Upload profile picture
+  profilePicPreview.addEventListener('click', () => {
+    uploadProfilePicInput.click();
+  });
+  uploadProfilePicInput.addEventListener('change', () => {
+    const file = uploadProfilePicInput.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      users[currentUser].profilePic = e.target.result;
+      saveUsers();
+      renderProfile();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Create board form submit
+  createBoardForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const boardName = boardNameInput.value.trim();
+    if(!boardName) return alert('Board name cannot be empty');
+    const boardId = 'b' + Date.now();
+    users[currentUser].boards[boardId] = {
+      name: boardName,
+      pins: []
+    };
+    saveUsers();
+    boardNameInput.value = '';
+    currentBoardId = boardId;
+    renderBoards();
+    showCurrentBoard();
+  });
+
+  // Add pin form submit
+  addPinForm.addEventListener('submit', e => {
+    e.preventDefault();
+    if(!currentBoardId) return alert('Select a board first');
+    const file = pinImageInput.files[0];
+    if(!file) {
+      alert('Please select an image');
+      return;
+    }
+    const caption = pinCaptionInput.value.trim();
+    const reader = new FileReader();
+    reader.onload = e => {
+      const newPin = { imageData: e.target.result, caption };
+      users[currentUser].boards[currentBoardId].pins.push(newPin);
+      saveUsers();
+      pinImageInput.value = '';
+      pinCaptionInput.value = '';
+      renderBoardPins();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Navigation buttons
+  navHome.addEventListener('click', () => {
+    showPage('home');
+  });
+  navSearch.addEventListener('click', () => {
+    showPage('search');
+    searchInput.value = '';
+    searchResults.innerHTML = '';
+  });
+  navProfile.addEventListener('click', () => {
+    showPage('profile');
+    renderProfile();
+  });
+  navLogout.addEventListener('click', () => {
+    currentUser = null;
+    currentBoardId = null;
+    saveUsers();
+    showPage('login');
+  });
+
+  // Login form submit
+  loginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const username = usernameInput.value.trim();
+    if(!username) {
+      loginError.textContent = 'Username cannot be empty';
+      return;
+    }
+    loginError.textContent = '';
+    loadUserData(username);
+    homeUsername.textContent = username;
+    usernameInput.value = '';
+    showPage('home');
+  });
+
+  // Search functionality
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim().toLowerCase();
+    searchResults.innerHTML = '';
+    if(!query) return;
+    const matchedUsers = Object.entries(users)
+      .filter(([uname]) => uname.toLowerCase().includes(query))
+      .slice(0, 10); // max 10 results
+
+    if(matchedUsers.length === 0) {
+      const li = document.createElement('li');
+      li.textContent = 'No users found.';
+      li.style.color = '#999';
+      searchResults.appendChild(li);
+      return;
+    }
+
+    matchedUsers.forEach(([uname, data]) => {
+      const li = document.createElement('li');
+      li.tabIndex = 0;
+      li.setAttribute('role', 'button');
+
+      const img = document.createElement('img');
+      img.src = data.profilePic || 'https://via.placeholder.com/50?text=No+Image';
+      img.alt = uname + "'s profile picture";
+
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'user-info';
+
+      const nameDiv = document.createElement('div');
+      nameDiv.className = 'user-name';
+      nameDiv.textContent = uname;
+
+      const bioDiv = document.createElement('div');
+      bioDiv.className = 'user-bio';
+      bioDiv.textContent = data.bio || '';
+
+      infoDiv.appendChild(nameDiv);
+      infoDiv.appendChild(bioDiv);
+
+      li.appendChild(img);
+      li.appendChild(infoDiv);
+
+      li.addEventListener('click', () => {
+        openReadonlyProfile(uname);
+      });
+      li.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          li.click();
+        }
+      });
+
+      searchResults.appendChild(li);
+    });
+  });
+
+  // Open read-only profile modal
+  function openReadonlyProfile(username) {
+    const userData = users[username];
+    if(!userData) return;
+    readonlyProfilePic.src = userData.profilePic || 'https://via.placeholder.com/120?text=No+Image';
+    readonlyProfileTitle.textContent = username;
+    readonlyProfileBio.textContent = userData.bio || '';
+    readonlyProfileModal.classList.add('active');
+  }
+  // Close readonly profile modal
+  closeReadonlyBtn.addEventListener('click', () => {
+    readonlyProfileModal.classList.remove('active');
+  });
+
+  // Start app
+  showPage('login');
+</script>
+
+</body>
+</html>
